@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlackRoad AI</title>
+<meta name="description" content="BlackRoad AI — Sovereign inference on owned hardware.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta property="og:title" content="BlackRoad AI"><meta property="og:url" content="https://blackroadai.com"><meta property="og:image" content="https://images.blackroad.io/brand/blackroad-og.png">
+<link rel="canonical" href="https://blackroadai.com">
+<link rel="icon" type="image/png" href="https://images.blackroad.io/brand/favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+:root{--g:linear-gradient(90deg,#FF6B2B,#FF2255,#CC00AA,#8844FF,#4488FF,#00D4FF);--g135:linear-gradient(135deg,#FF6B2B,#FF2255,#CC00AA,#8844FF,#4488FF,#00D4FF);--bg:#000;--border:#1a1a1a;--sub:#999;--dim:#333;--sg:'Space Grotesk',sans-serif;--jb:'JetBrains Mono',monospace}
+body{background:var(--bg);color:#f5f5f5;font-family:var(--sg);overflow-x:hidden;padding-bottom:48px}
+.grad-bar{height:4px;background:var(--g)}
+.container{max-width:100%;margin:0 auto;padding:32px 16px 0}
+.section{margin-bottom:40px}
+.section-label{font-family:var(--jb);font-size:10px;font-weight:500;color:var(--sub);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.title{font-size:24px;font-weight:700;color:#fff;margin-bottom:4px}
+.subtitle{font-size:13px;color:#aaa;margin-bottom:32px}
+.mark{width:24px;height:3px;border-radius:2px;background:var(--g);margin-bottom:16px}
+.card{border:1px solid var(--border);border-radius:10px;padding:16px;background:#0a0a0a;transition:border-color .2s,transform .15s;margin-bottom:10px;cursor:pointer}
+.card:hover{border-color:var(--dim)}.card:active{transform:scale(.985)}
+.card.no-click{cursor:default}.card.no-click:active{transform:none}
+.card-detail{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:#aaa;line-height:1.7}
+.card.open .card-detail{display:block}
+.card-arrow{float:right;font-size:14px;color:#555;transition:transform .2s}
+.card.open .card-arrow{transform:rotate(90deg)}
+.grid-2,.grid-3,.grid-4{display:grid;gap:10px;margin-bottom:16px}
+.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}
+.stat-val{font-size:22px;font-weight:700;color:#fff}
+.stat-label{font-family:var(--jb);font-size:9px;color:#aaa;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}.dot-live{background:var(--g135)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}.pulse{animation:pulse 2s infinite}
+.circle-accent{width:8px;height:8px;border-radius:50%;background:var(--g135);display:inline-block}
+.model-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.model-row:last-child{border-bottom:none}.model-row:active{background:#111}
+.model-name{font-size:13px;font-weight:500;color:#ddd;min-width:120px}
+.model-size{font-family:var(--jb);font-size:10px;color:#888;min-width:50px}
+.model-host{font-family:var(--jb);font-size:10px;color:#666;flex:1}
+.model-detail{display:none;padding:8px 0 6px 22px;font-size:11px;color:#999;line-height:1.8;border-bottom:1px solid var(--border)}
+/* widget */
+.widget-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.widget{border:1px solid var(--border);border-radius:12px;padding:16px;background:#0a0a0a;cursor:grab;transition:border-color .2s,transform .15s;position:relative;min-height:90px;display:flex;flex-direction:column;user-select:none}
+.widget:hover{border-color:var(--dim)}.widget:active{cursor:grabbing;transform:scale(.97)}
+.widget.dragging{opacity:.5}.widget.drag-over{border-color:#888;background:#111}
+.widget-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:10px;background:#111;border:1px solid var(--border)}
+.widget-name{font-size:12px;font-weight:600;color:#ddd;margin-bottom:2px}
+.widget-desc{font-family:var(--jb);font-size:9px;color:#888}
+.widget-link{position:absolute;inset:0;border-radius:12px;z-index:1}
+.widget-badge{position:absolute;top:8px;right:8px;font-family:var(--jb);font-size:8px;color:#666;background:#111;border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.widget-palette{display:none;border:1px solid var(--border);border-radius:12px;background:#0a0a0a;padding:16px;margin-bottom:16px}.widget-palette.open{display:block}
+.widget-palette-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.widget-palette-item{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;font-size:11px;color:#aaa}.widget-palette-item:hover{border-color:#555;color:#ddd}
+.widget-edit-mode .widget{animation:wiggle .3s ease-in-out infinite alternate}
+.widget-edit-mode .widget:nth-child(2n){animation-delay:.15s}
+@keyframes wiggle{0%{transform:rotate(-.5deg)}100%{transform:rotate(.5deg)}}
+.widget-remove{display:none;position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#333;border:1px solid #555;color:#aaa;font-size:11px;cursor:pointer;z-index:2;align-items:center;justify-content:center;line-height:1}
+.widget-edit-mode .widget-remove{display:flex}
+@media(min-width:600px){.container{padding:40px 24px 0;max-width:880px}.grid-3{grid-template-columns:repeat(3,1fr)}.grid-4{grid-template-columns:repeat(4,1fr)}.widget-grid{grid-template-columns:repeat(3,1fr)}.widget-palette-grid{grid-template-columns:repeat(3,1fr)}.title{font-size:28px}}
+@media(min-width:900px){.container{padding:48px 24px 0}.grid-2{grid-template-columns:repeat(2,1fr)}.widget-grid{grid-template-columns:repeat(4,1fr)}.widget-palette-grid{grid-template-columns:repeat(4,1fr)}.title{font-size:32px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="grad-bar"></div>
+<div class="container">
+
+  <div class="section">
+    <div class="mark"></div>
+    <div class="title">BlackRoad AI</div>
+    <div class="subtitle">Sovereign inference on owned hardware</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Compute</div>
+    <div class="grid-4">
+      <div class="card" onclick="toggle(this)"><span class="card-arrow">›</span><div class="stat-val">52</div><div class="stat-label">TOPS</div><div class="card-detail">2x Hailo-8 accelerators. Cecilia (26 TOPS) + Octavia (26 TOPS). Edge AI inference for object detection, classification, and model acceleration.</div></div>
+      <div class="card" onclick="toggle(this)"><span class="card-arrow">›</span><div class="stat-val">4</div><div class="stat-label">Inference Nodes</div><div class="card-detail">Cecilia (primary, 16 models), Lucidia, Gematria (6 models), Octavia. All running Ollama. Local-first, no external API calls.</div></div>
+      <div class="card" onclick="toggle(this)"><span class="card-arrow">›</span><div class="stat-val">16+</div><div class="stat-label">Models</div><div class="card-detail">llama3, mistral, codellama, phi, gemma, nomic-embed-text, deepseek-coder, neural-chat, starling, dolphin, and more.</div></div>
+      <div class="card" onclick="toggle(this)"><span class="card-arrow">›</span><div class="stat-val">0</div><div class="stat-label">API Calls Out</div><div class="card-detail">Zero external API calls. All inference runs on owned hardware. No OpenAI, no Anthropic API, no cloud providers. Fully sovereign.</div></div>
+    </div>
+  </div>
+
+  <!-- Hailo -->
+  <div class="section">
+    <div class="section-label">Hailo-8 Accelerators</div>
+    <div class="grid-2">
+      <div class="card" onclick="toggle(this)">
+        <span class="card-arrow">›</span>
+        <div style="display:flex;align-items:center;gap:8px"><span class="dot dot-live pulse"></span><span style="font-size:14px;font-weight:600;color:#ddd">Cecilia</span><span style="font-family:var(--jb);font-size:10px;color:#888">26 TOPS</span></div>
+        <div class="card-detail">Hailo-8 M.2 module. /dev/hailo0 verified. Used for real-time object detection, YOLOv5/v8 inference, and model acceleration. Combined with Ollama's 16 models for full AI pipeline.</div>
+      </div>
+      <div class="card" onclick="toggle(this)">
+        <span class="card-arrow">›</span>
+        <div style="display:flex;align-items:center;gap:8px"><span class="dot dot-live pulse"></span><span style="font-size:14px;font-weight:600;color:#ddd">Octavia</span><span style="font-family:var(--jb);font-size:10px;color:#888">26 TOPS</span></div>
+        <div class="card-detail">Hailo-8 M.2 module. Secondary accelerator for parallel inference workloads. Co-located with Gitea, Docker, and NATS for CI/CD-integrated AI pipelines.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Models -->
+  <div class="section">
+    <div class="section-label">Model Registry</div>
+    <div class="card no-click" id="models-card"></div>
+  </div>
+
+  <!-- RAG -->
+  <div class="section">
+    <div class="section-label">RAG System</div>
+    <div class="card" onclick="toggle(this)">
+      <span class="card-arrow">›</span>
+      <div style="font-size:14px;font-weight:600;color:#ddd;margin-bottom:4px"><span class="dot dot-live"></span>Qdrant + nomic-embed-text</div>
+      <div style="font-family:var(--jb);font-size:10px;color:#888">Vector store on Alice  ·  Embedding model on Cecilia</div>
+      <div class="card-detail">
+        Qdrant vector database on Alice (:6333). Documents are embedded using nomic-embed-text on Cecilia, stored as vectors, and retrieved for context-augmented generation.<br><br>
+        Sources indexed: codex solutions (693), TIL broadcasts, journal entries, wiki pages, corporate docs, academic papers (Greenbaum, Schleif, Reddi).<br><br>
+        Query flow: user question → embed with nomic → nearest neighbor search in Qdrant → top-k context → feed to llama3/mistral for generation.
+      </div>
+    </div>
+  </div>
+
+  <!-- Sovereignty -->
+  <div class="section">
+    <div class="section-label">Sovereignty</div>
+    <div class="card no-click">
+      <div style="font-size:12px;color:#ccc;line-height:1.8">
+        Every model runs on hardware we own or rent with full root access. No tokens leave the network. No usage data sent to third parties. Inference logs stay on-device. The only external dependency is downloading model weights from Ollama's registry — after that, everything is local.
+      </div>
+    </div>
+  </div>
+
+  <!-- Widget Grid -->
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="section-label" style="margin-bottom:0">Apps & Tools</div>
+      <button onclick="toggleEditMode()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--jb);font-size:9px;color:#888;cursor:pointer" id="edit-btn">Edit</button>
+    </div>
+    <div class="widget-palette" id="widget-palette"><div style="font-size:12px;color:#aaa;margin-bottom:4px">Add a widget</div><div class="widget-palette-grid" id="palette-grid"></div></div>
+    <div class="widget-grid" id="widget-grid"></div>
+  </div>
+
+  <div class="section" style="text-align:center">
+    <span style="font-size:11px;color:#aaa"><span class="circle-accent pulse"></span>&nbsp; AI uptime: <span id="uptime">calculating...</span></span>
+  </div>
+</div>
+<div class="grad-bar" style="margin-top:24px"></div>
+
+<script>
+function toggle(el){el.classList.toggle('open');}
+
+var models=[
+  {name:'llama3',size:'4.7GB',host:'Cecilia',desc:'Meta LLaMA 3 8B. General-purpose chat, reasoning, code. Primary model for most tasks.'},
+  {name:'mistral',size:'4.1GB',host:'Cecilia',desc:'Mistral 7B. Fast inference, strong reasoning. Good for structured outputs.'},
+  {name:'codellama',size:'3.8GB',host:'Cecilia',desc:'Code Llama 7B. Specialized for code generation, completion, and explanation.'},
+  {name:'phi',size:'1.6GB',host:'Cecilia',desc:'Microsoft Phi-2. Small but capable. Runs fast on Pi hardware.'},
+  {name:'gemma',size:'5.0GB',host:'Cecilia',desc:'Google Gemma 7B. Strong multilingual and reasoning capabilities.'},
+  {name:'nomic-embed-text',size:'274MB',host:'Cecilia',desc:'Embedding model for RAG. Converts text to 768-dim vectors for Qdrant similarity search.'},
+  {name:'deepseek-coder',size:'3.8GB',host:'Cecilia',desc:'DeepSeek Coder 6.7B. Trained on 2T code tokens. Strong at generation and infilling.'},
+  {name:'neural-chat',size:'4.1GB',host:'Cecilia',desc:'Intel Neural Chat 7B. Optimized for conversational AI.'},
+  {name:'starling-lm',size:'4.1GB',host:'Cecilia',desc:'Starling LM 7B. RLHF-tuned for helpful, harmless responses.'},
+  {name:'dolphin-mistral',size:'4.1GB',host:'Cecilia',desc:'Dolphin Mistral. Uncensored variant for research and testing.'},
+  {name:'llama3',size:'4.7GB',host:'Gematria',desc:'LLaMA 3 on cloud edge. Serves requests routed through Caddy.'},
+  {name:'mistral',size:'4.1GB',host:'Gematria',desc:'Mistral on cloud edge. Backup inference path.'},
+  {name:'codellama',size:'3.8GB',host:'Gematria',desc:'Code Llama on cloud edge.'},
+  {name:'phi',size:'1.6GB',host:'Gematria',desc:'Phi-2 on cloud edge. Fastest response times.'},
+  {name:'gemma',size:'5.0GB',host:'Gematria',desc:'Gemma on cloud edge.'},
+  {name:'nomic-embed-text',size:'274MB',host:'Gematria',desc:'Embedding model on cloud edge for distributed RAG.'},
+];
+
+document.getElementById('models-card').innerHTML=models.map(function(m){
+  return '<div class="model-row" onclick="var d=this.nextElementSibling;d.style.display=d.style.display===\'block\'?\'none\':\'block\'">'+
+    '<span class="dot dot-live"></span>'+
+    '<span class="model-name">'+m.name+'</span>'+
+    '<span class="model-size">'+m.size+'</span>'+
+    '<span class="model-host">'+m.host+'</span>'+
+    '</div><div class="model-detail">'+m.desc+'</div>';
+}).join('');
+
+// Widget system
+var WIDGET_CATALOG=[{id:'chat',name:'Chat',desc:'RoundTrip',icon:'💬',href:'https://chat.blackroad.io',badge:'Live'},{id:'search',name:'Search',desc:'Search all',icon:'🔍',href:'https://search.blackroad.io',badge:'Live'},{id:'pay',name:'Pay',desc:'Checkout',icon:'💳',href:'https://pay.blackroad.io'},{id:'status',name:'Status',desc:'Fleet health',icon:'📡',href:'https://status.blackroad.io'},{id:'github',name:'GitHub',desc:'Source',icon:'⚡',href:'https://github.com/BlackRoad-OS-Inc'},{id:'ai',name:'AI',desc:'Playground',icon:'🧠',href:'https://blackroadai.com'},{id:'network',name:'Network',desc:'Mesh',icon:'🌐',href:'https://blackroad.network'},{id:'systems',name:'Systems',desc:'Fleet',icon:'🖥',href:'https://blackroad.systems'},{id:'identity',name:'Identity',desc:'Profile',icon:'👤',href:'https://blackroad.me'},{id:'company',name:'Company',desc:'Corporate',icon:'🏛',href:'https://blackroad.company'},{id:'quantum',name:'Quantum',desc:'QI',icon:'⚛',href:'https://blackroadquantum.com'},{id:'lucidia',name:'Lucidia',desc:'Companion',icon:'✧',href:'https://lucidia.earth'},{id:'math',name:'Math',desc:'Amundson',icon:'∑',href:'https://github.com/BlackRoad-OS-Inc/amundson-constant'},{id:'docs',name:'Docs',desc:'Docs hub',icon:'📄',href:'https://docs.blackroad.io'},{id:'brand',name:'Brand',desc:'Design',icon:'◼',href:'https://brand.blackroad.io'}];
+var STORAGE_KEY='br-widgets-ai';
+var DEFAULT_WIDGETS=['ai','chat','search','systems','network','github','quantum','lucidia'];
+function getActiveWidgets(){try{var s=localStorage.getItem(STORAGE_KEY);if(s)return JSON.parse(s);}catch(e){}return DEFAULT_WIDGETS.slice();}
+function saveActiveWidgets(ids){localStorage.setItem(STORAGE_KEY,JSON.stringify(ids));}
+var editMode=false;
+function toggleEditMode(){editMode=!editMode;document.getElementById('edit-btn').textContent=editMode?'Done':'Edit';document.getElementById('widget-palette').classList.toggle('open',editMode);document.getElementById('widget-grid').classList.toggle('widget-edit-mode',editMode);renderWidgets();renderPalette();}
+function renderWidgets(){var ids=getActiveWidgets();document.getElementById('widget-grid').innerHTML=ids.map(function(id,i){var w=WIDGET_CATALOG.find(function(x){return x.id===id});if(!w)return '';return '<div class="widget" draggable="true" data-id="'+w.id+'" data-index="'+i+'" ondragstart="wDragStart(event)" ondragover="wDragOver(event)" ondrop="wDrop(event)" ondragend="wDragEnd(event)">'+(editMode?'<div class="widget-remove" onclick="removeWidget(\''+w.id+'\')">×</div>':'')+'<div class="widget-icon">'+w.icon+'</div><div class="widget-name">'+w.name+'</div><div class="widget-desc">'+w.desc+'</div>'+(w.badge?'<div class="widget-badge">'+w.badge+'</div>':'')+(!editMode?'<a href="'+w.href+'" target="_blank" class="widget-link"></a>':'')+'</div>';}).join('');}
+function renderPalette(){var ids=getActiveWidgets();var avail=WIDGET_CATALOG.filter(function(w){return ids.indexOf(w.id)===-1});var pg=document.getElementById('palette-grid');if(!avail.length){pg.innerHTML='<div style="font-size:11px;color:#555;padding:8px">All added</div>';return;}pg.innerHTML=avail.map(function(w){return '<div class="widget-palette-item" onclick="addWidget(\''+w.id+'\')">'+w.icon+' '+w.name+'</div>';}).join('');}
+function addWidget(id){var ids=getActiveWidgets();if(ids.indexOf(id)===-1){ids.push(id);saveActiveWidgets(ids);}renderWidgets();renderPalette();}
+function removeWidget(id){var ids=getActiveWidgets().filter(function(x){return x!==id});saveActiveWidgets(ids);renderWidgets();renderPalette();}
+var dragIdx=null;
+function wDragStart(e){dragIdx=+e.target.closest('.widget').dataset.index;e.target.closest('.widget').classList.add('dragging');}
+function wDragOver(e){e.preventDefault();e.target.closest('.widget')?.classList.add('drag-over');}
+function wDrop(e){e.preventDefault();document.querySelectorAll('.widget').forEach(function(x){x.classList.remove('drag-over')});var t=e.target.closest('.widget');if(!t)return;var ti=+t.dataset.index;if(dragIdx===null||dragIdx===ti)return;var ids=getActiveWidgets();var m=ids.splice(dragIdx,1)[0];ids.splice(ti,0,m);saveActiveWidgets(ids);renderWidgets();}
+function wDragEnd(e){dragIdx=null;document.querySelectorAll('.widget').forEach(function(x){x.classList.remove('dragging','drag-over')});}
+renderWidgets();
+
+var founded=new Date('2025-11-17T00:00:00Z');
+function uptime(){var diff=Date.now()-founded;var d=Math.floor(diff/86400000);var h=Math.floor((diff%86400000)/3600000);var m=Math.floor((diff%3600000)/60000);document.getElementById('uptime').textContent=d+'d '+h+'h '+m+'m';}
+uptime();setInterval(uptime,60000);
+</script>
+</body>
+</html>
+<!-- v1774241327 -->
